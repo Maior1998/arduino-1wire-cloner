@@ -4,16 +4,14 @@ OneWire iButton(IBUTTON_PIN); // создаём объект 1-wire на 2 вы�
 
 void setup (void) {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(IBUTTON_PIN, INPUT);
   Serial.begin(9600);
 }
 
 void loop(void) {
   delay(1000); // задержка 1 сек
   byte addr[8]; // массив для хранения данных ключа
-  
+  Serial.println("Waiting for a original . . .");
   while ( !iButton.search(addr) ) { // если ключ не приложен
-      //Serial.println("Waiting for a original . . .");
       iButton.reset_search();
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
       delay(500);                       // wait
@@ -73,19 +71,17 @@ Serial.print("Key : ");
     pinMode(IBUTTON_PIN, INPUT); 
     digitalWrite(IBUTTON_PIN, HIGH);
     delay(10);
+
+    
     iButton.skip(); 
     iButton.reset(); 
     iButton.write(0xD5);
     
-
-
-    
     for (byte i = 0; i<8; i++){
-      writeByte(new_addr[i]);
+      writeByte(addr[i]);
       Serial.print("* ");
     }
     Serial.print('\n');
-
     
     iButton.reset(); // send 0xD1
     iButton.write(0xD1); //send logical 1
@@ -98,6 +94,11 @@ Serial.print("Key : ");
 
     
     Serial.println("Overrided!");
+    iButton.skip(); iButton.reset(); iButton.write(0x33);
+    Serial.print("ID after write:");
+    for (byte x = 0; x < 8; x++) {
+      Serial.print(' '); Serial.print(iButton.read(), HEX);
+    }
     for(int i=0; i<10;i++){
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
       delay(100);                       // wait
